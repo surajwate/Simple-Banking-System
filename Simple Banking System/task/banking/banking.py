@@ -1,15 +1,16 @@
 import random
 import sqlite3
 
-conn = sqlite3.connect('card.s3db')
+conn = sqlite3.connect('card.s3db')  # Create database "card.s3db"
 c = conn.cursor()
 
+# Create the table "card"
 c.execute("""
             CREATE TABLE IF NOT EXISTS card(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                number    TEXT UNIQUE,
+                number    TEXT,
                 pin       TEXT,
-                balance   INTERGER DEFAULT 0
+                balance   INTEGER
             );
         """)
 
@@ -70,7 +71,8 @@ Your card number:
 Your card PIN:
 {}""".format(number, random_pin))
     params = (number, random_pin)
-    c.execute("INSERT INTO card (number, pin) VALUES (?, ?)", params)
+    c.execute("INSERT INTO card (number, pin) VALUES (?, ?)", params)  # Update the table "card" in database
+    conn.commit()  # commit the changes in database to avoid the locking of database
 
 
 while True:
