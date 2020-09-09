@@ -68,9 +68,11 @@ def login(card):
             print(f"Balance: {balance}")
         elif operation == '2':
             amount = int(input("Enter income:"))
+            c.execute(f"SELECT balance FROM card WHERE number = {card}")
+            balance = c.fetchone()[0]
             c.execute(f"""
                             UPDATE card
-                            SET balance = {amount}
+                            SET balance = {balance + amount}
                             WHERE number = {card}
             """)
             conn.commit()
