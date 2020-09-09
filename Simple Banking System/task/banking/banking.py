@@ -18,9 +18,14 @@ c.execute("DELETE FROM card")
 card_info = {}
 
 def do_transfer(card):
-    account = input("Enter card number:")
+    account = input("Enter card number:")  # get the card number to which the amount is to be transferred
+    c.execute("SELECT number FROM card")  # Select the number column from table "card" of the database
+    a_list = c.fetchall()  # Fetch all the selected numbers from number column in form of tuple in a list
+    account_list = [i[0] for i in a_list]  # convert the list of tuple into list of integer
     if luhn_algo(account[:-1]) != account[-1]:
         print("Probably you made a mistake in the card number. Please try again!")
+    elif account not in account_list:
+        print("Such a card does not exist.")
     else:
         amount = int(input("Enter how much money you want to transfer:"))
         print("Success!")
