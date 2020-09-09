@@ -13,22 +13,73 @@ c.execute("""
                 balance   INTEGER
             );
         """)
-
+c.execute("DELETE FROM card")
 
 card_info = {}
 
+def do_transfer(card):
+    account = input("Enter card number:")  # get the card number to which the amount is to be transferred
+    c.execute("SELECT number FROM card")  # Select the number column from table "card" of the database
+    a_list = c.fetchall()  # Fetch all the selected numbers from number column in form of tuple in a list
+    account_list = [i[0] for i in a_list]  # convert the list of tuple into list of integer
+    if luhn_algo(account[:-1]) != account[-1]:
+        print("Probably you made a mistake in the card number. Please try again!")
+    elif account not in account_list:
+        print("Such a card does not exist.")
+    else:
+        amount = int(input("Enter how much money you want to transfer:"))
+        c.execute(f"SELECT balance FROM card WHERE number = {card}")
+        balance = c.fetchone()[0]
+        if balance < amount:
+            print("Not enough money!")
+        else:
+            c.execute(f"SELECT balance FROM card WHERE number = {card}")
+            balance = c.fetchone()[0]
+            c.execute(f"""
+                            UPDATE card
+                            SET balance = {balance - amount}
+                            WHERE number = {card}
+            """)
+            conn.commit()
+            c.execute(f"SELECT balance FROM card WHERE number = {account}")
+            balance = c.fetchone()[0]
+            c.execute(f"""
+                            UPDATE card
+                            SET balance = {balance + amount}
+                            WHERE number = {account}
+            """)
+            conn.commit()
+            print("Success!")
 
-def login():
+def login(card):
     print("You have successfully logged in!")
     while True:
         operation = input("""
 1. Balance
-2. Log out
+2. Add income
+3. Do transfer
+4. Close account
+5. Log out
 0. Exit
 """)
         if operation == "1":
-            print("Balance: 0")
-        elif operation == "2":
+            c.execute(f"SELECT balance FROM card WHERE number = {card}")
+            balance = c.fetchone()[0]
+            print(f"Balance: {balance}")
+        elif operation == '2':
+            amount = int(input("Enter income:"))
+            c.execute(f"""
+                            UPDATE card
+                            SET balance = {amount}
+                            WHERE number = {card}
+            """)
+            conn.commit()
+            print("Income was added!")
+        elif operation == '3':
+            do_transfer(card)
+        elif operation == '4':
+            pass
+        elif operation == "5":
             print("You have successfully logged out!")
             return None
         elif operation == '0':
@@ -70,8 +121,9 @@ Your card number:
 {}
 Your card PIN:
 {}""".format(number, random_pin))
-    params = (number, random_pin)
-    c.execute("INSERT INTO card (number, pin) VALUES (?, ?)", params)  # Update the table "card" in database
+    balance = 0
+    params = (number, random_pin, balance)
+    c.execute("INSERT INTO card (number, pin, balance) VALUES (?, ?, ?)", params)  # Update the table "card" in database
     conn.commit()  # commit the changes in database to avoid the locking of database
 
 
@@ -90,7 +142,7 @@ while True:
         pin = int(input("Enter your PIN:\n"))
         if card_number in card_info:
             if pin == card_info[card_number]:
-                login()
+                login(card_number)
             else:
                 print("Wrong card number or PIN!")
         else:
