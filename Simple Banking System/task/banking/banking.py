@@ -13,6 +13,7 @@ c.execute("""
                 balance   INTEGER
             );
         """)
+c.execute("DELETE FROM card")
 
 
 card_info = {}
@@ -34,7 +35,14 @@ def login(card):
             balance = c.fetchone()[0]
             print(f"Balance: {balance}")
         elif operation == '2':
-            pass
+            amount = int(input("Enter income:"))
+            c.execute(f"""
+                            UPDATE card
+                            SET balance = {amount}
+                            WHERE number = {card}
+            """)
+            conn.commit()
+            print("Income was added!")
         elif operation == '3':
             pass
         elif operation == '4':
