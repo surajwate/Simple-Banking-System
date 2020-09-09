@@ -15,9 +15,15 @@ c.execute("""
         """)
 c.execute("DELETE FROM card")
 
-
 card_info = {}
 
+def do_transfer(card):
+    account = input("Enter card number:")
+    if luhn_algo(account[:-1]) != account[-1]:
+        print("Probably you made a mistake in the card number. Please try again!")
+    else:
+        amount = int(input("Enter how much money you want to transfer:"))
+        print("Success!")
 
 def login(card):
     print("You have successfully logged in!")
@@ -44,7 +50,7 @@ def login(card):
             conn.commit()
             print("Income was added!")
         elif operation == '3':
-            pass
+            do_transfer(card)
         elif operation == '4':
             pass
         elif operation == "5":
