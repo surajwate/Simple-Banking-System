@@ -28,7 +28,28 @@ def do_transfer(card):
         print("Such a card does not exist.")
     else:
         amount = int(input("Enter how much money you want to transfer:"))
-        print("Success!")
+        c.execute(f"SELECT balance FROM card WHERE number = {card}")
+        balance = c.fetchone()[0]
+        if balance < amount:
+            print("Not enough money!")
+        else:
+            c.execute(f"SELECT balance FROM card WHERE number = {card}")
+            balance = c.fetchone()[0]
+            c.execute(f"""
+                            UPDATE card
+                            SET balance = {balance - amount}
+                            WHERE number = {card}
+            """)
+            conn.commit()
+            c.execute(f"SELECT balance FROM card WHERE number = {account}")
+            balance = c.fetchone()[0]
+            c.execute(f"""
+                            UPDATE card
+                            SET balance = {balance + amount}
+                            WHERE number = {account}
+            """)
+            conn.commit()
+            print("Success!")
 
 def login(card):
     print("You have successfully logged in!")
