@@ -30,7 +30,9 @@ def login(card):
 0. Exit
 """)
         if operation == "1":
-            print("Balance: 0")
+            c.execute(f"SELECT balance FROM card WHERE number = {card}")
+            balance = c.fetchone()[0]
+            print(f"Balance: {balance}")
         elif operation == '2':
             pass
         elif operation == '3':
@@ -79,8 +81,9 @@ Your card number:
 {}
 Your card PIN:
 {}""".format(number, random_pin))
-    params = (number, random_pin)
-    c.execute("INSERT INTO card (number, pin) VALUES (?, ?)", params)  # Update the table "card" in database
+    balance = 0
+    params = (number, random_pin, balance)
+    c.execute("INSERT INTO card (number, pin, balance) VALUES (?, ?, ?)", params)  # Update the table "card" in database
     conn.commit()  # commit the changes in database to avoid the locking of database
 
 
