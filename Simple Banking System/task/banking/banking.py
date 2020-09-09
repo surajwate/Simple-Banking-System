@@ -18,17 +18,26 @@ c.execute("""
 card_info = {}
 
 
-def login():
+def login(card):
     print("You have successfully logged in!")
     while True:
         operation = input("""
 1. Balance
-2. Log out
+2. Add income
+3. Do transfer
+4. Close account
+5. Log out
 0. Exit
 """)
         if operation == "1":
             print("Balance: 0")
-        elif operation == "2":
+        elif operation == '2':
+            pass
+        elif operation == '3':
+            pass
+        elif operation == '4':
+            pass
+        elif operation == "5":
             print("You have successfully logged out!")
             return None
         elif operation == '0':
@@ -90,7 +99,7 @@ while True:
         pin = int(input("Enter your PIN:\n"))
         if card_number in card_info:
             if pin == card_info[card_number]:
-                login()
+                login(card_number)
             else:
                 print("Wrong card number or PIN!")
         else:
