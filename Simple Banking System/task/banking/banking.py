@@ -18,6 +18,10 @@ c.execute("DELETE FROM card")
 
 card_info = {}
 
+def get_balance(card):
+    c.execute(f"SELECT balance FROM card WHERE number = {card}")
+    return c.fetchone()[0]
+
 def do_transfer(card):
     account = input("Enter card number:")  # get the card number to which the amount is to be transferred
     c.execute("SELECT number FROM card")  # Select the number column from table "card" of the database
@@ -29,21 +33,18 @@ def do_transfer(card):
         print("Such a card does not exist.")
     else:
         amount = int(input("Enter how much money you want to transfer:"))
-        c.execute(f"SELECT balance FROM card WHERE number = {card}")
-        balance = c.fetchone()[0]
+        balance = get_balance(card)
         if balance < amount:
             print("Not enough money!")
         else:
-            c.execute(f"SELECT balance FROM card WHERE number = {card}")
-            balance = c.fetchone()[0]
+            balance = get_balance(card)
             c.execute(f"""
                             UPDATE card
                             SET balance = {balance - amount}
                             WHERE number = {card}
             """)
             conn.commit()
-            c.execute(f"SELECT balance FROM card WHERE number = {account}")
-            balance = c.fetchone()[0]
+            balance = get_balance(account)
             c.execute(f"""
                             UPDATE card
                             SET balance = {balance + amount}
@@ -64,13 +65,11 @@ def login(card):
 0. Exit
 """)
         if operation == "1":
-            c.execute(f"SELECT balance FROM card WHERE number = {card}")
-            balance = c.fetchone()[0]
+            balance = get_balance(card)
             print(f"Balance: {balance}")
         elif operation == '2':
             amount = int(input("Enter income:"))
-            c.execute(f"SELECT balance FROM card WHERE number = {card}")
-            balance = c.fetchone()[0]
+            balance = get_balance(card)
             c.execute(f"""
                             UPDATE card
                             SET balance = {balance + amount}
