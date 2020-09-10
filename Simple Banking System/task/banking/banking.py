@@ -1,10 +1,10 @@
 import random
 import sqlite3
 
-conn = sqlite3.connect('card.s3db')  # Create database "card.s3db"
-c = conn.cursor()
+conn = sqlite3.connect('card.s3db')  # Create database ("card.s3db") connection
+c = conn.cursor()  # create cursor object 'c'
 
-# Create the table "card"
+# Create the table "card" if it does not exist in database
 c.execute("""
             CREATE TABLE IF NOT EXISTS card(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,6 +13,7 @@ c.execute("""
                 balance   INTEGER
             );
         """)
+#  Remove everthing (old data) from table "card". You can delete this line if you want to maintain the database.
 c.execute("DELETE FROM card")
 
 card_info = {}
@@ -21,8 +22,8 @@ def do_transfer(card):
     account = input("Enter card number:")  # get the card number to which the amount is to be transferred
     c.execute("SELECT number FROM card")  # Select the number column from table "card" of the database
     a_list = c.fetchall()  # Fetch all the selected numbers from number column in form of tuple in a list
-    account_list = [i[0] for i in a_list]  # convert the list of tuple into list of integer
-    if luhn_algo(account[:-1]) != account[-1]:
+    account_list = [i[0] for i in a_list]  # convert the list of tuple into list of integer (account numbers)
+    if luhn_algo(account[:-1]) != account[-1]:  # check the validity of account number by using luhn algorithm
         print("Probably you made a mistake in the card number. Please try again!")
     elif account not in account_list:
         print("Such a card does not exist.")
